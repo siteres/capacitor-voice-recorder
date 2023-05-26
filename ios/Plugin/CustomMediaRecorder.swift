@@ -19,6 +19,10 @@ class CustomMediaRecorder {
     private func getDirectoryToSaveAudioFile() -> URL {
         return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
     }
+
+    @objc private func handleInterruption(notification: Notification) {
+        stopRecording();
+    }
     
     public func startRecording() -> Bool {
         do {
@@ -26,6 +30,13 @@ class CustomMediaRecorder {
             originalRecordingSessionCategory = recordingSession.category
             try recordingSession.setCategory(AVAudioSession.Category.playAndRecord)
             try recordingSession.setActive(true)
+
+            let nc = NotificationCenter.default
+            nc.addObserver(self,
+               selector: #selector(handleInterruption),
+               name: AVAudioSession.interruptionNotification,
+               object: recordingSession)
+
             audioFilePath = getDirectoryToSaveAudioFile().appendingPathComponent("\(UUID().uuidString).aac")
             audioRecorder = try AVAudioRecorder(url: audioFilePath, settings: settings)
             audioRecorder.record()
@@ -37,15 +48,17 @@ class CustomMediaRecorder {
     }
     
     public func stopRecording() {
-        do {
-            audioRecorder.stop()
-            try recordingSession.setActive(false)
-            try recordingSession.setCategory(originalRecordingSessionCategory)
-            originalRecordingSessionCategory = nil
-            audioRecorder = nil
-            recordingSession = nil
-            status = CurrentRecordingStatus.NONE
-        } catch {}
+        if (audioRecorder != nil) { 
+            do {
+                audioRecorder.stop()
+                try recordingSession.setActive(false)
+                try recordingSession.setCategory(originalRecordingSessionCategory)
+                originalRecordingSessionCategory = nil
+                audioRecorder = nil
+                recordingSession = nil
+                status = CurrentRecordingStatus.NONE
+            } catch {}
+        }
     }
     
     public func getOutputFile() -> URL {
