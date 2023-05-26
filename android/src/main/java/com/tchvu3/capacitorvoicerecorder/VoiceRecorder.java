@@ -98,7 +98,7 @@ public class VoiceRecorder extends Plugin {
             mediaRecorder.stopRecording();
             File recordedFile = mediaRecorder.getOutputFile();
             RecordData recordData = new RecordData(
-                    readRecordedFileAsBase64(recordedFile),
+                    recordedFile.getAbsolutePath(), // readRecordedFileAsBase64(recordedFile),
                     getMsDurationOfAudioFile(recordedFile.getAbsolutePath()),
                     "audio/aac"
             );
@@ -110,7 +110,7 @@ public class VoiceRecorder extends Plugin {
         } catch (Exception exp) {
             call.reject(Messages.FAILED_TO_FETCH_RECORDING, exp);
         } finally {
-            mediaRecorder.deleteOutputFile();
+            // mediaRecorder.deleteOutputFile();
             mediaRecorder = null;
         }
     }

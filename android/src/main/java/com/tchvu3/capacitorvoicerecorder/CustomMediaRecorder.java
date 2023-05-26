@@ -24,16 +24,15 @@ public class CustomMediaRecorder {
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mediaRecorder.setAudioEncodingBitRate(96000);
-        mediaRecorder.setAudioSamplingRate(44100);
+        mediaRecorder.setAudioEncodingBitRate(16*44100); 
+        mediaRecorder.setAudioSamplingRate(44100); 
         setRecorderOutputFile();
         mediaRecorder.prepare();
     }
 
     private void setRecorderOutputFile() throws IOException {
-        File outputDir = context.getCacheDir();
+        File outputDir = context.getExternalFilesDir(null); 
         outputFile = File.createTempFile("voice_record_temp", ".aac", outputDir);
-        outputFile.deleteOnExit();
         mediaRecorder.setOutputFile(outputFile.getAbsolutePath());
     }
 
@@ -102,8 +101,8 @@ public class CustomMediaRecorder {
         } catch (Exception exp) {
             return exp.getMessage().startsWith("stop failed");
         } finally {
-            if (tempMediaRecorder != null)
-                tempMediaRecorder.deleteOutputFile();
+            //if (tempMediaRecorder != null) 
+            //    tempMediaRecorder.deleteOutputFile(); 
         }
     }
 
